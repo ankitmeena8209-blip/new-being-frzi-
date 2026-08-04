@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Lock, LogOut, Plus, Trash2, Edit3, ExternalLink, ArrowLeft, ShieldCheck, Sparkles, Wand2, Loader2, Check } from "lucide-react";
+import { Lock, LogOut, Plus, Trash2, Edit3, ExternalLink, ArrowLeft, ShieldCheck, Wand2, Loader2, Check } from "lucide-react";
 import { Project, fetchProjects } from "@/lib/supabase";
 
 export default function AdminPage() {
@@ -19,8 +19,8 @@ export default function AdminPage() {
   const [fetching, setFetching] = useState(false);
 
   // Simplified Add Project Form
-  const [newTitle, setNewTitle] = useState("");
   const [newGithub, setNewGithub] = useState("");
+  const [newTitle, setNewTitle] = useState("");
   const [newDemo, setNewDemo] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newCat, setNewCat] = useState("Fullstack");
@@ -88,11 +88,9 @@ export default function AdminPage() {
   };
 
   // Auto-Fetch repository metadata from GitHub API
-  const handleAutoFetchRepo = async () => {
-    if (!newGithub.trim()) {
-      setFormMsg("Please enter a valid Git Repository URL first.");
-      return;
-    }
+  const handleAutoFetchRepo = async (overrideUrl?: string) => {
+    const targetUrl = overrideUrl || newGithub;
+    if (!targetUrl.trim()) return;
 
     setFetchingRepo(true);
     setFormMsg("");
@@ -101,22 +99,22 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/fetch-repo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: newGithub }),
+        body: JSON.stringify({ url: targetUrl }),
       });
 
       const data = await res.json();
       if (res.ok && data.success && data.repoInfo) {
         const info = data.repoInfo;
-        if (!newTitle.trim()) setNewTitle(info.title);
+        if (!newTitle.trim() || newTitle === "Untitled Project") setNewTitle(info.title);
         setNewDesc(info.description);
         setNewCat(info.category);
         setNewTags(info.tags.join(", "));
-        setFormMsg(`✨ Auto-filled metadata from GitHub (${info.stars} ⭐ stars, branch '${info.default_branch}')!`);
+        setFormMsg(`✨ Auto-fetched metadata from GitHub (${info.stars} ⭐ stars, branch '${info.default_branch}')!`);
       } else {
         setFormMsg(`Note: ${data.error || "Could not fetch GitHub info automatically."}`);
       }
     } catch (err: any) {
-      setFormMsg("Auto-fetch error. You can still enter details manually.");
+      setFormMsg("Auto-fetch note: Enter details manually if needed.");
     } finally {
       setFetchingRepo(false);
     }
@@ -153,7 +151,8 @@ export default function AdminPage() {
         setProjects((prev) => [data.project, ...prev.filter((p) => p.id !== data.project.id)]);
         setFormMsg("🎉 Project published successfully to database & website!");
       } else {
-        setProjects((prev) => [{ ...payload, id: Date.now().toString() } as Project, ...prev]);
+        const fallbackObj = { ...payload, id: Date.now().toString() };
+        setProjects((prev) => [fallbackObj, ...prev]);
         setFormMsg("Project saved.");
       }
 
@@ -198,13 +197,15 @@ export default function AdminPage() {
         tags: editTags.split(",").map((t) => t.trim()).filter(Boolean),
       };
 
-      await fetch(`/api/projects/${editingProject.id}`, {
+      const res = await fetch(`/api/projects/${editingProject.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedPayload),
       });
 
-      // Update state reactively
+      const data = await res.json();
+
+      // Update state reactively for immediate reflection on UI
       setProjects((prev) =>
         prev.map((p) =>
           p.id === editingProject.id ? { ...p, ...updatedPayload } : p
@@ -221,9 +222,9 @@ export default function AdminPage() {
 
   // Delete Project (DELETE)
   const handleDeleteProject = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm("Are you sure you want to permanently delete this project?")) return;
 
-    // Optimistic UI state update
+    // Immediate reactive state removal
     setProjects((prev) => prev.filter((p) => p.id !== id));
 
     try {
@@ -343,7 +344,7 @@ export default function AdminPage() {
                   <h2 className="font-display text-2xl flex items-center gap-2">
                     <Plus size={20} /> Publish New Project
                   </h2>
-                  <span className="font-mono text-[11px] text-muted uppercase">Workflow: 3 Quick Steps</span>
+                  <span className="font-mono text-[11px] text-muted uppercase">Git Auto-Import Active</span>
                 </div>
 
                 {formMsg && (
@@ -354,18 +355,18 @@ export default function AdminPage() {
 
                 <form onSubmit={handleAddProject} className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   
-                  {/* Step 1: Git Repository URL with Auto-Fetch Button */}
+                  {/* Field 1: Git Repository URL */}
                   <div className="sm:col-span-2">
                     <div className="flex items-center justify-between">
-                      <label className="block font-mono text-xs uppercase text-muted">1. Git Repository URL</label>
+                      <label className="block font-mono text-xs uppercase text-muted">1. Git Repository URL *</label>
                       <button
                         type="button"
-                        onClick={handleAutoFetchRepo}
+                        onClick={() => handleAutoFetchRepo()}
                         disabled={fetchingRepo}
                         className="inline-flex items-center gap-1.5 font-mono text-xs text-ink hover:underline disabled:opacity-50"
                       >
                         {fetchingRepo ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
-                        Auto-Fill Details from GitHub
+                        Auto-Fetch Details from GitHub
                       </button>
                     </div>
                     <input
@@ -373,14 +374,19 @@ export default function AdminPage() {
                       required
                       value={newGithub}
                       onChange={(e) => setNewGithub(e.target.value)}
+                      onBlur={() => {
+                        if (newGithub.trim() && !newDesc.trim()) {
+                          handleAutoFetchRepo(newGithub);
+                        }
+                      }}
                       placeholder="https://github.com/owner/repository"
                       className="mt-1 w-full rounded-xl border border-hairline bg-paper px-4 py-2.5 font-mono text-sm outline-none focus:border-ink"
                     />
                   </div>
 
-                  {/* Step 2: Project Name */}
+                  {/* Field 2: Project Name */}
                   <div>
-                    <label className="block font-mono text-xs uppercase text-muted">2. Project Name</label>
+                    <label className="block font-mono text-xs uppercase text-muted">2. Project Name *</label>
                     <input
                       type="text"
                       required
@@ -391,9 +397,9 @@ export default function AdminPage() {
                     />
                   </div>
 
-                  {/* Step 3: Live Website URL */}
+                  {/* Field 3: Live Website URL */}
                   <div>
-                    <label className="block font-mono text-xs uppercase text-muted">3. Live Website URL (Optional)</label>
+                    <label className="block font-mono text-xs uppercase text-muted">3. Live Website URL</label>
                     <input
                       type="text"
                       value={newDemo}
@@ -403,14 +409,14 @@ export default function AdminPage() {
                     />
                   </div>
 
-                  {/* Auto-filled details (Editable if needed) */}
+                  {/* Auto-filled details (Editable) */}
                   <div className="sm:col-span-2">
-                    <label className="block font-mono text-xs uppercase text-muted">Description (Auto-Filled)</label>
+                    <label className="block font-mono text-xs uppercase text-muted">Description (Auto-Filled from GitHub)</label>
                     <textarea
                       rows={2}
                       value={newDesc}
                       onChange={(e) => setNewDesc(e.target.value)}
-                      placeholder="Repository description..."
+                      placeholder="Repository overview & README summary..."
                       className="mt-1 w-full rounded-xl border border-hairline bg-paper px-4 py-2 font-body text-sm outline-none focus:border-ink"
                     />
                   </div>

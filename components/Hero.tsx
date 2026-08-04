@@ -56,7 +56,7 @@ export default function Hero() {
         {/* Layer 2: 3D HTML ANKIT Text (sitting behind character) */}
         <motion.div
           style={{ y: textParallax, willChange: "transform" }}
-          className="absolute -top-2 left-0 right-0 z-0 flex justify-center text-center pointer-events-none select-none sm:-top-6"
+          className="absolute top-6 left-0 right-0 z-0 flex justify-center text-center pointer-events-none select-none sm:top-2"
         >
           <motion.h1
             initial={{ opacity: 0, y: 40, scale: 0.95, filter: "blur(8px)" }}

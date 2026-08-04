@@ -18,38 +18,37 @@ export interface Project {
   created_at?: string;
 }
 
-export const FALLBACK_PROJECTS: Project[] = [
-  {
-    id: "1",
-    title: "Being FRZI Portfolio",
-    description: "Ultra-sleek portfolio & web platform with Framer Motion, dynamic typography, and Supabase integration.",
-    category: "Fullstack",
-    image_url: "/images/face-card.png",
-    demo_url: "https://being-frzi.vercel.app",
-    github_url: "https://github.com/ankitmeena8209-blip/new-being-frzi-",
-    tags: ["Next.js 14", "Tailwind CSS", "Framer Motion", "Supabase"],
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "AI Creative Studio",
-    description: "High-performance generative asset generator and smart prompt engineering workflow tool.",
-    category: "AI/ML",
-    image_url: "/images/hero-ankit.png",
-    demo_url: "https://github.com/ankitmeena8209-blip",
-    github_url: "https://github.com/ankitmeena8209-blip",
-    tags: ["React", "Python", "OpenAI", "FastAPI"],
-    featured: true,
-  },
-];
+export const FALLBACK_PROJECTS: Project[] = [];
+
+export function mapRowToProject(row: any): Project {
+  if (!row) return row;
+  const url = row.url || "";
+  const isGithub = typeof url === "string" && url.includes("github.com");
+  return {
+    id: String(row.id),
+    title: row.title || row.name || "Untitled Project",
+    description: row.description || "",
+    category: row.category || row.icon || "Fullstack",
+    image_url: row.image_url || row.thumbnail || "/images/face-card.png",
+    demo_url: row.demo_url !== undefined ? row.demo_url : (!isGithub && url ? url : null),
+    github_url: row.github_url !== undefined ? row.github_url : (isGithub ? url : null),
+    tags: Array.isArray(row.tags)
+      ? row.tags
+      : row.icon
+      ? [row.icon]
+      : ["Next.js", "React"],
+    featured: row.featured ?? row.is_featured ?? true,
+    created_at: row.created_at || new Date().toISOString(),
+  };
+}
 
 export async function fetchProjects(): Promise<Project[]> {
   try {
     const res = await fetch("/api/projects", { cache: "no-store" });
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
+      if (Array.isArray(data)) {
+        return data.map(mapRowToProject);
       }
     }
   } catch (err) {

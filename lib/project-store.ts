@@ -12,32 +12,7 @@ export interface ProjectItem {
 }
 
 // Initial default projects
-let PROJECTS_STORE: ProjectItem[] = [
-  {
-    id: "1",
-    title: "Being FRZI Portfolio",
-    description: "Ultra-sleek portfolio & web platform with Framer Motion, dynamic typography, and Supabase integration.",
-    category: "Fullstack",
-    image_url: "/images/face-card.png",
-    demo_url: "https://being-frzi.vercel.app",
-    github_url: "https://github.com/ankitmeena8209-blip/new-being-frzi-",
-    tags: ["Next.js 14", "Tailwind CSS", "Framer Motion", "Supabase"],
-    featured: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    title: "AI Creative Studio",
-    description: "High-performance generative asset generator and smart prompt engineering workflow tool.",
-    category: "AI/ML",
-    image_url: "/images/hero-ankit.png",
-    demo_url: "https://github.com/ankitmeena8209-blip",
-    github_url: "https://github.com/ankitmeena8209-blip",
-    tags: ["React", "Python", "OpenAI", "FastAPI"],
-    featured: true,
-    created_at: new Date().toISOString(),
-  },
-];
+let PROJECTS_STORE: ProjectItem[] = [];
 
 const DELETED_IDS: Set<string> = new Set();
 

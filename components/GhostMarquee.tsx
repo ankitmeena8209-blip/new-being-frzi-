@@ -1,18 +1,24 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef } from "react";
 
 export default function GhostMarquee() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
-  // Scroll parallax shifts
-  const x1 = useTransform(scrollY, [0, 800], [0, -120]);
-  const x2 = useTransform(scrollY, [0, 800], [0, 120]);
-  const x3 = useTransform(scrollY, [0, 800], [0, -80]);
+  // Raw scroll transforms
+  const rawX1 = useTransform(scrollY, [0, 1000], [0, -160]);
+  const rawX2 = useTransform(scrollY, [0, 1000], [0, 160]);
+  const rawX3 = useTransform(scrollY, [0, 1000], [0, -120]);
 
-  const rowTransforms = [x1, x2, x3];
+  // Spring physics interpolation for 60fps buttery-smooth motion
+  const springConfig = { stiffness: 70, damping: 26, mass: 0.2 };
+  const smoothX1 = useSpring(rawX1, springConfig);
+  const smoothX2 = useSpring(rawX2, springConfig);
+  const smoothX3 = useSpring(rawX3, springConfig);
+
+  const rowTransforms = [smoothX1, smoothX2, smoothX3];
   const rows = ["BEING FRZI", "BEING FRZI", "BEING FRZI"];
 
   return (
@@ -32,7 +38,7 @@ export default function GhostMarquee() {
             opacity: 1 - i * 0.18,
             willChange: "transform",
           }}
-          className="text-outline font-display text-[16vw] leading-[0.85] tracking-tight whitespace-nowrap sm:text-[11vw] transition-transform duration-75"
+          className="text-outline font-display text-[16vw] leading-[0.85] tracking-tight whitespace-nowrap sm:text-[11vw]"
         >
           {row}
         </motion.span>

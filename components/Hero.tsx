@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import GhostMarquee from "./GhostMarquee";
 
 const STATS = [
@@ -11,6 +11,12 @@ const STATS = [
 ];
 
 export default function Hero() {
+  const { scrollY } = useScroll();
+
+  // Scroll parallax for 3D text (moves at 40% speed behind character)
+  const rawTextY = useTransform(scrollY, [0, 600], [0, 80]);
+  const textParallax = useSpring(rawTextY, { stiffness: 80, damping: 25 });
+
   return (
     <section
       id="hero"
@@ -36,17 +42,59 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      {/* main portrait — the "pic 1" background image, ANKIT wordmark baked in */}
+      {/* main portrait container */}
       <div className="relative z-10 mx-auto mt-6 w-full max-w-md flex-1 sm:max-w-lg">
+        
+        {/* Layer 2: Real 3D HTML/CSS ANKIT Text (behind character) */}
+        <motion.div
+          style={{ y: textParallax, willChange: "transform" }}
+          className="absolute -top-4 left-0 right-0 z-0 flex justify-center text-center pointer-events-none select-none sm:-top-6"
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 40, scale: 0.95, filter: "blur(8px)" }}
+            animate={{
+              opacity: 1,
+              y: [0, -3.5, 0],
+              scale: 1,
+              filter: "blur(0px)",
+            }}
+            transition={{
+              opacity: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+              y: { repeat: Infinity, duration: 4.5, ease: "easeInOut" },
+              scale: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+              filter: { duration: 0.9 },
+            }}
+            className="font-display text-[22vw] sm:text-[135px] md:text-[170px] lg:text-[195px] font-black leading-none tracking-tight text-white"
+            style={{
+              textShadow: `
+                0 1px 0 #e2e8f0,
+                0 2px 0 #cbd5e1,
+                0 3px 0 #94a3b8,
+                0 4px 0 #64748b,
+                0 5px 0 #475569,
+                0 6px 1px rgba(0,0,0,0.12),
+                0 0 5px rgba(0,0,0,0.1),
+                0 1px 3px rgba(0,0,0,0.3),
+                0 3px 6px rgba(0,0,0,0.25),
+                0 8px 16px rgba(0,0,0,0.2),
+                0 16px 24px rgba(0,0,0,0.15)
+              `,
+            }}
+          >
+            ANKIT
+          </motion.h1>
+        </motion.div>
+
+        {/* Layer 3: Character PNG (Ankit, transparent cutout) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative aspect-[4/5] w-full"
+          className="relative z-10 aspect-[4/5] w-full"
         >
           <Image
             src="/images/hero-ankit.png"
-            alt="Ankit, hand raised to lips in a shush gesture, ANKIT wordmark above him"
+            alt="Ankit, hand raised to lips in a shush gesture"
             fill
             priority
             sizes="(max-width: 640px) 100vw, 512px"
@@ -54,13 +102,13 @@ export default function Hero() {
           />
         </motion.div>
 
-        {/* poster's whisper-bubble callout */}
+        {/* Layer 4: Speech-bubble callout */}
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
           whileHover={{ y: -3 }}
-          className="absolute left-0 top-[38%] flex items-center gap-2 rounded-full border border-hairline bg-paper px-3 py-2 shadow-sm sm:-left-6"
+          className="absolute left-0 top-[38%] z-20 flex items-center gap-2 rounded-full border border-hairline bg-paper px-3 py-2 shadow-sm sm:-left-6"
         >
           <span className="font-mono text-[10px] leading-tight text-inkSoft sm:text-xs">
             Shh... building in silence.
@@ -69,7 +117,7 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* poster's B&W polaroid card, replaced with the suited portrait */}
+        {/* Layer 5: Suited polaroid card */}
         <motion.a
           href="#about"
           initial={{ opacity: 0, y: 20, rotate: 6 }}
@@ -78,7 +126,7 @@ export default function Hero() {
           transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           whileHover={{ rotate: 0, scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          className="absolute -bottom-6 -right-2 w-28 rounded-xl border border-hairline bg-ink p-1.5 shadow-lg sm:-right-8 sm:w-36"
+          className="absolute -bottom-6 -right-2 z-20 w-28 rounded-xl border border-hairline bg-ink p-1.5 shadow-lg sm:-right-8 sm:w-36"
         >
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md">
             <Image

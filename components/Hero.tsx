@@ -67,17 +67,11 @@ export default function Hero() {
             className="font-display text-[22vw] sm:text-[135px] md:text-[170px] lg:text-[195px] font-black leading-none tracking-tight text-white"
             style={{
               textShadow: `
-                0 1px 0 #e2e8f0,
-                0 2px 0 #cbd5e1,
-                0 3px 0 #94a3b8,
-                0 4px 0 #64748b,
-                0 5px 0 #475569,
-                0 6px 1px rgba(0,0,0,0.12),
-                0 0 5px rgba(0,0,0,0.1),
-                0 1px 3px rgba(0,0,0,0.3),
-                0 3px 6px rgba(0,0,0,0.25),
-                0 8px 16px rgba(0,0,0,0.2),
-                0 16px 24px rgba(0,0,0,0.15)
+                0 1px 0 #f1f5f9,
+                0 2px 0 #e2e8f0,
+                0 3px 0 #cbd5e1,
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 10px 20px rgba(0, 0, 0, 0.04)
               `,
             }}
           >

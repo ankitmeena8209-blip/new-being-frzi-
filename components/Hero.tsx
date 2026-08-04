@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import GhostMarquee from "./GhostMarquee";
@@ -11,20 +12,27 @@ const STATS = [
 ];
 
 export default function Hero() {
-  const { scrollY } = useScroll();
+  const heroRef = useRef<HTMLDivElement>(null);
 
-  // Scroll parallax for 3D text (moves at 40% speed behind character)
-  const rawTextY = useTransform(scrollY, [0, 600], [0, 80]);
-  const textParallax = useSpring(rawTextY, { stiffness: 80, damping: 25 });
+  // Container-relative scroll progress tracking (works bi-directionally on mobile touch & desktop)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Smooth 60fps translation behind character (0px -> 140px)
+  const rawTextY = useTransform(scrollYProgress, [0, 1], [0, 140]);
+  const textParallax = useSpring(rawTextY, { stiffness: 75, damping: 24, mass: 0.2 });
 
   return (
     <section
+      ref={heroRef}
       id="hero"
       className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-paper px-4 pb-8 pt-24 sm:px-8 sm:pt-28"
     >
       <GhostMarquee />
 
-      {/* top meta row — poster's "IDN 48 / NEW GENERATION" + "VER 2.4" strip */}
+      {/* top meta row */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -45,10 +53,10 @@ export default function Hero() {
       {/* main portrait container */}
       <div className="relative z-10 mx-auto mt-6 w-full max-w-md flex-1 sm:max-w-lg">
         
-        {/* Layer 2: Real 3D HTML/CSS ANKIT Text (behind character) */}
+        {/* Layer 2: 3D HTML ANKIT Text (sitting behind character) */}
         <motion.div
           style={{ y: textParallax, willChange: "transform" }}
-          className="absolute -top-4 left-0 right-0 z-0 flex justify-center text-center pointer-events-none select-none sm:-top-6"
+          className="absolute -top-2 left-0 right-0 z-0 flex justify-center text-center pointer-events-none select-none sm:-top-6"
         >
           <motion.h1
             initial={{ opacity: 0, y: 40, scale: 0.95, filter: "blur(8px)" }}
@@ -79,7 +87,7 @@ export default function Hero() {
           </motion.h1>
         </motion.div>
 
-        {/* Layer 3: Character PNG (Ankit, transparent cutout) */}
+        {/* Layer 3: Character PNG (Ankit transparent cutout) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -138,7 +146,7 @@ export default function Hero() {
         </motion.a>
       </div>
 
-      {/* stat bar — poster's black postingan/pengikut pill */}
+      {/* stat bar */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}

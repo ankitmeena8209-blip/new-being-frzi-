@@ -12,7 +12,7 @@ export default function Home() {
   const links = getSocialLinks();
 
   return (
-    <main className="relative">
+    <main className="relative bg-paper">
       <Header />
       <ConnectRail links={links} />
       <ScrollRail />
@@ -20,9 +20,12 @@ export default function Home() {
       <Hero />
       <Stack />
       <About />
-      <ConnectStrip links={links} />
-
-      <Footer />
+      
+      {/* Dark section wrapper containing Contact & Footer so no white space appears beneath on mobile */}
+      <div className="bg-ink">
+        <ConnectStrip links={links} />
+        <Footer />
+      </div>
     </main>
   );
 }

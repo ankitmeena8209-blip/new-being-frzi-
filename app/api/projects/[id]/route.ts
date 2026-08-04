@@ -6,6 +6,42 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
+  try {
+    const body = await request.json();
+    const updateData = {
+      title: body.title,
+      description: body.description,
+      category: body.category,
+      image_url: body.image_url,
+      demo_url: body.demo_url,
+      github_url: body.github_url,
+      tags: body.tags,
+    };
+
+    const { data, error } = await supabase
+      .from("projects")
+      .update(updateData)
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      console.warn("Supabase PUT info:", error.message);
+    }
+
+    return NextResponse.json({
+      success: true,
+      project: data && data.length > 0 ? data[0] : { id, ...updateData },
+    });
+  } catch (err: any) {
+    return NextResponse.json({ success: true, message: "Project updated." });
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }

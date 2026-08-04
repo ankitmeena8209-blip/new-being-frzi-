@@ -11,8 +11,8 @@ export interface Project {
   description: string;
   category: string;
   image_url: string;
-  demo_url?: string;
-  github_url?: string;
+  demo_url?: string | null;
+  github_url?: string | null;
   tags: string[];
   featured?: boolean;
   created_at?: string;

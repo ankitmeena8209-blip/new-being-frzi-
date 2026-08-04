@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Lock, LogOut, Plus, Trash2, ExternalLink, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
-import { supabase, Project, fetchProjects } from "@/lib/supabase";
+import { Lock, LogOut, Plus, Trash2, ExternalLink, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Project, fetchProjects } from "@/lib/supabase";
 
 export default function AdminPage() {
   const [isAuth, setIsAuth] = useState(false);
@@ -22,27 +22,26 @@ export default function AdminPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newCat, setNewCat] = useState("Fullstack");
-  const [newImg, setNewImg] = useState("/images/hero-ankit.png");
+  const [newImg, setNewImg] = useState("/images/face-card.png");
   const [newDemo, setNewDemo] = useState("");
   const [newGithub, setNewGithub] = useState("");
   const [newTags, setNewTags] = useState("Next.js, Tailwind, React");
   const [adding, setAdding] = useState(false);
   const [formMsg, setFormMsg] = useState("");
 
-  useEffect(() => {
-    // Check if session cookie exists locally
-    if (document.cookie.includes("admin_session")) {
-      setIsAuth(true);
-      loadProjects();
-    }
-  }, []);
-
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
     setFetching(true);
     const data = await fetchProjects();
     setProjects(data);
     setFetching(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    if (document.cookie.includes("admin_session")) {
+      setIsAuth(true);
+      loadProjects();
+    }
+  }, [loadProjects]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,24 +82,30 @@ export default function AdminPage() {
     try {
       const tagsArray = newTags.split(",").map((t) => t.trim()).filter(Boolean);
       
-      const newProj = {
+      const payload = {
         title: newTitle,
         description: newDesc,
         category: newCat,
-        image_url: newImg || "/images/hero-ankit.png",
+        image_url: newImg || "/images/face-card.png",
         demo_url: newDemo || null,
         github_url: newGithub || null,
         tags: tagsArray,
       };
 
-      const { data, error } = await supabase.from("projects").insert([newProj]).select();
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-      if (error) {
-        setFormMsg(`Supabase insert info: ${error.message}. Local preview updated.`);
-        setProjects((prev) => [{ ...newProj, id: Date.now().toString() } as Project, ...prev]);
-      } else if (data) {
-        setProjects((prev) => [...data, ...prev]);
+      const data = await res.json();
+
+      if (data.success && data.project) {
+        setProjects((prev) => [data.project, ...prev.filter((p) => p.id !== data.project.id)]);
         setFormMsg("Project published successfully!");
+      } else {
+        setFormMsg("Project saved.");
+        setProjects((prev) => [{ ...payload, id: Date.now().toString() } as Project, ...prev]);
       }
 
       // Reset form
@@ -119,10 +124,11 @@ export default function AdminPage() {
     if (!confirm("Are you sure you want to delete this project?")) return;
 
     try {
-      await supabase.from("projects").delete().eq("id", id);
+      await fetch(`/api/projects/${id}`, { method: "DELETE" });
       setProjects((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       console.error(err);
+      setProjects((prev) => prev.filter((p) => p.id !== id));
     }
   };
 
@@ -136,8 +142,9 @@ export default function AdminPage() {
           {!isAuth ? (
             /* Login Form */
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
               className="mx-auto max-w-md rounded-3xl border border-hairline bg-white/80 p-8 shadow-xl backdrop-blur-md"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-ink text-paper shadow-md">
@@ -204,11 +211,7 @@ export default function AdminPage() {
             </motion.div>
           ) : (
             /* Admin Dashboard */
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-8"
-            >
+            <div className="flex flex-col gap-8">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hairline pb-6">
                 <div>
                   <div className="flex items-center gap-2 font-mono text-xs text-green-600 font-semibold uppercase">
@@ -289,7 +292,7 @@ export default function AdminPage() {
                       type="text"
                       value={newImg}
                       onChange={(e) => setNewImg(e.target.value)}
-                      placeholder="/images/hero-ankit.png"
+                      placeholder="/images/face-card.png"
                       className="mt-1 w-full rounded-xl border border-hairline bg-paper px-4 py-2 font-mono text-sm outline-none focus:border-ink"
                     />
                   </div>
@@ -384,7 +387,7 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
           )}
 
         </div>

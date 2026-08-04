@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,12 +27,12 @@ export default function WorkPage() {
     loadData();
   }, []);
 
-  const filteredProjects =
-    selectedCategory === "All"
-      ? projects
-      : projects.filter(
-          (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
-        );
+  const filteredProjects = useMemo(() => {
+    if (selectedCategory === "All") return projects;
+    return projects.filter(
+      (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
+    );
+  }, [projects, selectedCategory]);
 
   return (
     <main className="relative flex min-h-screen w-full flex-col bg-paper text-ink overflow-x-hidden">
@@ -42,32 +42,23 @@ export default function WorkPage() {
       {/* Top Banner / Hero */}
       <section className="relative z-10 px-4 pt-32 pb-12 sm:px-8 sm:pt-36">
         <div className="mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between"
-          >
+          <div className="flex items-center justify-between">
             <a
               href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-hairline bg-paper/80 px-4 py-2 text-xs font-mono tracking-widest uppercase text-inkSoft hover:bg-ink hover:text-paper transition-all"
+              className="inline-flex items-center gap-2 rounded-full border border-hairline bg-paper/80 px-4 py-2 text-xs font-mono tracking-widest uppercase text-inkSoft hover:bg-ink hover:text-paper transition-colors"
             >
               <ArrowLeft size={14} /> Back to Home
             </a>
 
             <a
               href="/admin"
-              className="inline-flex items-center gap-2 rounded-full border border-hairline bg-ink px-4 py-2 text-xs font-mono tracking-widest uppercase text-paper hover:bg-ink/80 transition-all shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-hairline bg-ink px-4 py-2 text-xs font-mono tracking-widest uppercase text-paper hover:bg-ink/80 transition-colors shadow-sm"
             >
               <Lock size={12} /> Admin Portal
             </a>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-8"
-          >
+          <div className="mt-8">
             <p className="font-mono text-xs uppercase tracking-widest2 text-muted">
               003 &middot; Portfolio Showcase
             </p>
@@ -77,15 +68,10 @@ export default function WorkPage() {
             <p className="mt-4 max-w-xl font-body text-base text-inkSoft">
               A curated collection of web apps, client projects, mobile experiences, and AI side projects built with obsession over design and performance.
             </p>
-          </motion.div>
+          </div>
 
           {/* Category Filter Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-10 flex flex-wrap items-center gap-2 border-b border-hairline pb-6"
-          >
+          <div className="mt-10 flex flex-wrap items-center gap-2 border-b border-hairline pb-6">
             <div className="flex items-center gap-1.5 pr-3 text-xs font-mono text-muted uppercase">
               <Filter size={14} /> Filter:
             </div>
@@ -93,7 +79,7 @@ export default function WorkPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded-full px-4 py-1.5 font-mono text-xs tracking-wider transition-all ${
+                className={`rounded-full px-4 py-1.5 font-mono text-xs tracking-wider transition-colors ${
                   selectedCategory === cat
                     ? "bg-ink text-paper shadow-sm"
                     : "border border-hairline bg-white/40 text-inkSoft hover:bg-white"
@@ -102,7 +88,7 @@ export default function WorkPage() {
                 {cat}
               </button>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -124,95 +110,85 @@ export default function WorkPage() {
               </button>
             </div>
           ) : (
-            <motion.div
-              layout
-              className="grid grid-cols-1 gap-8 md:grid-cols-2"
-            >
-              <AnimatePresence>
-                {filteredProjects.map((project, i) => (
-                  <motion.div
-                    key={project.id}
-                    layout
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: i * 0.08, duration: 0.5 }}
-                    whileHover={{ y: -6 }}
-                    className="group relative flex flex-col overflow-hidden rounded-3xl border border-hairline bg-white/60 p-6 shadow-sm transition-all hover:shadow-xl hover:border-ink/20"
-                  >
-                    {/* Image Preview */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-paper/50 border border-hairline">
-                      <Image
-                        src={project.image_url || "/images/hero-ankit.png"}
-                        alt={project.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute top-3 left-3 rounded-full bg-ink/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-paper backdrop-blur-sm">
-                        {project.category}
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              {filteredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="group relative flex flex-col overflow-hidden rounded-3xl border border-hairline bg-white/60 p-6 shadow-sm transition-all hover:shadow-xl hover:border-ink/20"
+                >
+                  {/* Image Preview */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-paper/50 border border-hairline">
+                    <Image
+                      src={project.image_url || "/images/face-card.png"}
+                      alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 500px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 left-3 rounded-full bg-ink/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-paper backdrop-blur-sm">
+                      {project.category}
+                    </div>
+                  </div>
+
+                  {/* Meta */}
+                  <div className="mt-5 flex flex-1 flex-col justify-between">
+                    <div>
+                      <h3 className="font-display text-2xl group-hover:text-signal transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="mt-2 font-body text-sm text-inkSoft leading-relaxed line-clamp-3">
+                        {project.description}
+                      </p>
+
+                      {/* Tags */}
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {project.tags?.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-md border border-hairline bg-paper/80 px-2 py-0.5 font-mono text-[10px] text-muted"
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Meta */}
-                    <div className="mt-5 flex flex-1 flex-col justify-between">
-                      <div>
-                        <h3 className="font-display text-2xl group-hover:text-signal transition-colors">
-                          {project.title}
-                        </h3>
-                        <p className="mt-2 font-body text-sm text-inkSoft leading-relaxed line-clamp-3">
-                          {project.description}
-                        </p>
-
-                        {/* Tags */}
-                        <div className="mt-4 flex flex-wrap gap-1.5">
-                          {project.tags?.map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-md border border-hairline bg-paper/80 px-2 py-0.5 font-mono text-[10px] text-muted"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                    {/* Action Links */}
+                    <div className="mt-6 flex items-center justify-between border-t border-hairline pt-4">
+                      <div className="flex items-center gap-3">
+                        {project.demo_url && (
+                          <a
+                            href={project.demo_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 font-mono text-xs text-ink hover:underline"
+                          >
+                            <ExternalLink size={14} /> Live Demo
+                          </a>
+                        )}
+                        {project.github_url && (
+                          <a
+                            href={project.github_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 font-mono text-xs text-muted hover:text-ink transition-colors"
+                          >
+                            <Github size={14} /> Code
+                          </a>
+                        )}
                       </div>
 
-                      {/* Action Links */}
-                      <div className="mt-6 flex items-center justify-between border-t border-hairline pt-4">
-                        <div className="flex items-center gap-3">
-                          {project.demo_url && (
-                            <a
-                              href={project.demo_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 font-mono text-xs text-ink hover:underline"
-                            >
-                              <ExternalLink size={14} /> Live Demo
-                            </a>
-                          )}
-                          {project.github_url && (
-                            <a
-                              href={project.github_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 font-mono text-xs text-muted hover:text-ink transition-colors"
-                            >
-                              <Github size={14} /> Code
-                            </a>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={() => setSelectedProject(project)}
-                          className="font-mono text-xs text-inkSoft hover:text-ink underline uppercase"
-                        >
-                          Details &rarr;
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setSelectedProject(project)}
+                        className="font-mono text-xs text-inkSoft hover:text-ink underline uppercase"
+                      >
+                        Details &rarr;
+                      </button>
                     </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </motion.div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </section>
@@ -228,9 +204,9 @@ export default function WorkPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-md"
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
+              initial={{ scale: 0.95, y: 10 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
+              exit={{ scale: 0.95, y: 10 }}
               onClick={(e) => e.stopPropagation()}
               className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-hairline bg-paper p-6 sm:p-8 shadow-2xl"
             >
@@ -250,9 +226,10 @@ export default function WorkPage() {
 
               <div className="relative mt-4 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-hairline">
                 <Image
-                  src={selectedProject.image_url || "/images/hero-ankit.png"}
+                  src={selectedProject.image_url || "/images/face-card.png"}
                   alt={selectedProject.title}
                   fill
+                  sizes="600px"
                   className="object-cover"
                 />
               </div>

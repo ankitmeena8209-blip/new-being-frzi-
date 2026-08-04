@@ -24,7 +24,7 @@ export const FALLBACK_PROJECTS: Project[] = [
     title: "Being FRZI Portfolio",
     description: "Ultra-sleek portfolio & web platform with Framer Motion, dynamic typography, and Supabase integration.",
     category: "Fullstack",
-    image_url: "/images/hero-ankit.png",
+    image_url: "/images/face-card.png",
     demo_url: "https://being-frzi.vercel.app",
     github_url: "https://github.com/ankitmeena8209-blip/new-being-frzi-",
     tags: ["Next.js 14", "Tailwind CSS", "Framer Motion", "Supabase"],
@@ -35,40 +35,26 @@ export const FALLBACK_PROJECTS: Project[] = [
     title: "AI Creative Studio",
     description: "High-performance generative asset generator and smart prompt engineering workflow tool.",
     category: "AI/ML",
-    image_url: "/images/face-card.png",
+    image_url: "/images/hero-ankit.png",
     demo_url: "https://github.com/ankitmeena8209-blip",
     github_url: "https://github.com/ankitmeena8209-blip",
     tags: ["React", "Python", "OpenAI", "FastAPI"],
     featured: true,
   },
-  {
-    id: "3",
-    title: "Mobile Commerce App",
-    description: "Cross-platform mobile application built with React Native for instant flash sales.",
-    category: "Mobile",
-    image_url: "/images/face-card.png",
-    demo_url: "https://github.com/ankitmeena8209-blip",
-    github_url: "https://github.com/ankitmeena8209-blip",
-    tags: ["React Native", "Expo", "Stripe", "PostgreSQL"],
-    featured: false,
-  },
 ];
 
 export async function fetchProjects(): Promise<Project[]> {
   try {
-    const { data, error } = await supabase
-      .from("projects")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error || !data || data.length === 0) {
-      console.warn("Supabase query returned empty/error, using fallback projects:", error?.message);
-      return FALLBACK_PROJECTS;
+    const res = await fetch("/api/projects", { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
     }
-
-    return data as Project[];
   } catch (err) {
-    console.error("Failed to connect to Supabase projects table:", err);
-    return FALLBACK_PROJECTS;
+    console.error("Failed to fetch projects API:", err);
   }
+
+  return FALLBACK_PROJECTS;
 }

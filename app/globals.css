@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f5f5f3;
+  color: #0a0a0a;
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: #0a0a0a;
+  color: #f5f5f3;
+}
+
+/* visible keyboard focus, always */
+:focus-visible {
+  outline: 2px solid #0a0a0a;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.text-outline {
+  -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.14);
+  color: transparent;
+}
+
+@supports (color: color(display-p3 1 1 1)) {
+  .text-outline {
+    -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.16);
+  }
+}

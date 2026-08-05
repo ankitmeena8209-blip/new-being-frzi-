@@ -10,13 +10,15 @@ const ENCRYPTED_MAP: Record<string, string> = {
   instagram: "NysrLyxlcHA6MSwrPjgtPjJxPDAycD06NjE4ADktJTY=", // https://instagram.com/being_frzi
   snapchat: "NysrLyxlcHAoKChxLDE+Lzw3PitxPDAycD47O3A9OjYxOAA5LSU2", // https://www.snapchat.com/add/being_frzi
   github: "NysrLyxlcHA8Nis3Kj1xPDAycD4xNDYrMjo6MT5nbW9mcj0zNi8=", // https://github.com/ankitmeena8209-blip
-  linkedin: "NysrLyxlcHA6MSwrPjgtPjJxPDAycD4xNDYrMjo6MT5uZ21vZg==",
+  whatsapp: "NysrLyxlcHAoPnEyOnA9OjYxOAA5LSU2bg==", // https://wa.me/being_frzi1
+  linkedin: "NysrLyxlcHAzNjE0Ojs2MXE8MDI=",
 };
 
 function decryptUrl(b64: string): string {
   try {
-    const raw = Buffer.from(b64, "base64").toString("utf8");
-    return raw.split("").map((c) => String.fromCharCode(c.charCodeAt(0) ^ CIPHER_KEY)).join("");
+    const rawBuf = Buffer.from(b64, "base64");
+    const decryptedBuf = Buffer.from(rawBuf.map((b) => b ^ CIPHER_KEY));
+    return decryptedBuf.toString("utf8");
   } catch {
     return "/";
   }
@@ -35,6 +37,7 @@ export async function GET(
   else if (id === "instagram") targetUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || process.env.INSTAGRAM_URL || "";
   else if (id === "snapchat") targetUrl = process.env.NEXT_PUBLIC_SNAPCHAT_URL || process.env.SNAPCHAT_URL || "";
   else if (id === "github") targetUrl = process.env.NEXT_PUBLIC_GITHUB_URL || process.env.GITHUB_URL || "";
+  else if (id === "whatsapp") targetUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL || process.env.WHATSAPP_URL || "";
   else if (id === "linkedin") targetUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || process.env.LINKEDIN_URL || "";
 
   // 2. If env variable is missing or placeholder, use decrypted fallback token
@@ -54,3 +57,5 @@ export async function GET(
 
   return NextResponse.redirect(targetUrl, 307);
 }
+
+

@@ -2,7 +2,7 @@ export type SocialLink = {
   id: string;
   label: string;
   href: string;
-  icon: "telegram" | "mail" | "instagram" | "snapchat" | "github" | "linkedin";
+  icon: "telegram" | "whatsapp" | "mail" | "instagram" | "snapchat" | "github" | "linkedin";
 };
 
 /**
@@ -16,6 +16,12 @@ export function getSocialLinks(): SocialLink[] {
       label: "Telegram",
       href: "/api/connect/telegram",
       icon: "telegram",
+    },
+    {
+      id: "whatsapp",
+      label: "WhatsApp",
+      href: "/api/connect/whatsapp",
+      icon: "whatsapp",
     },
     {
       id: "email",
@@ -54,3 +60,4 @@ export function getSocialLinks(): SocialLink[] {
 
   return links;
 }
+

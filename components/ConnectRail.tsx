@@ -5,14 +5,32 @@ import { motion } from "framer-motion";
 import { Send, Mail, Instagram, Github, Ghost, Linkedin } from "lucide-react";
 import type { SocialLink } from "@/lib/socials";
 
+const WhatsAppIcon: ComponentType<{ size?: number }> = ({ size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17.498 14.382c-.301-.15-1.781-.878-2.056-.978-.275-.1-.475-.15-.675.15-.2.3-.775.978-.95 1.178-.175.2-.35.225-.65.075-.3-.15-1.268-.467-2.417-1.492-.892-.796-1.494-1.78-1.669-2.08-.175-.3-.018-.462.132-.61.135-.133.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.582-.492-.503-.675-.512-.175-.01-.375-.01-.575-.01-.2 0-.525.075-.8.375-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.112 3.226 5.117 4.523.714.309 1.272.494 1.707.632.717.228 1.37.196 1.886.119.575-.086 1.781-.728 2.031-1.431.25-.703.25-1.305.175-1.43-.075-.126-.275-.201-.575-.351z" />
+    <path d="M12 2a10 10 0 0 0-8.485 15.315L2 22l4.81-1.261A10 10 0 1 0 12 2z" />
+  </svg>
+);
+
 const ICONS: Record<SocialLink["icon"], ComponentType<{ size?: number }>> = {
   telegram: Send,
+  whatsapp: WhatsAppIcon,
   mail: Mail,
   instagram: Instagram,
   snapchat: Ghost,
   github: Github,
   linkedin: Linkedin,
 };
+
 
 export default function ConnectRail({ links }: { links: SocialLink[] }) {
   const [isPastStack, setIsPastStack] = useState(false);

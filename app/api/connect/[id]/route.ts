@@ -7,9 +7,9 @@ const ENCRYPTED_MAP: Record<string, string> = {
   telegram: "NysrLyxlcHArcTI6cDYyAD4xNDY2Kw==", // https://t.me/im_ankiit
   email: "Mj42MyswZT4xNDYrODoyNjE2ax84Mj42M3E8MDI=", // mailto:ankitgemini4@gmail.com
   mail: "Mj42MyswZT4xNDYrODoyNjE2ax84Mj42M3E8MDI=",
-  instagram: "NysrLyxlcHA6MSwrPjgtPjJxPDAycD06NjE4ADktJTY=", // https://instagram.com/being_frzi
+  instagram: "NysrLyxlcHA2MSwrPjgtPjJxPDAycD06NjE4ADktJTY=", // https://instagram.com/being_frzi
   snapchat: "NysrLyxlcHAoKChxLDE+Lzw3PitxPDAycD47O3A9OjYxOAA5LSU2", // https://www.snapchat.com/add/being_frzi
-  github: "NysrLyxlcHA8Nis3Kj1xPDAycD4xNDYrMjo6MT5nbW9mcj0zNi8=", // https://github.com/ankitmeena8209-blip
+  github: "NysrLyxlcHA4Nis3Kj1xPDAycD4xNDYrMjo6MT5nbW9mcj0zNi8=", // https://github.com/ankitmeena8209-blip
   whatsapp: "NysrLyxlcHAoPnEyOnA9OjYxOAA5LSU2bg==", // https://wa.me/being_frzi1
   linkedin: "NysrLyxlcHAzNjE0Ojs2MXE8MDI=",
 };

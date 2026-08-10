@@ -69,7 +69,7 @@ export default function About() {
           transition={{ delay: 0.1 }}
           className="mt-4 max-w-xl text-sm text-inkSoft sm:text-base"
         >
-          I'm Ankit — professional overthinker, part-time developer, full-time
+          I'm Ankit... professional overthinker, part-time developer, full-time
           bakchod. Kabhi code likhta hoon, kabhi code mujhe likh deta hai.
         </motion.p>
 

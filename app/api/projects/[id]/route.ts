@@ -21,7 +21,7 @@ export async function PUT(
       description: body.description,
       url: body.demo_url || body.github_url || "",
       icon: body.category || (Array.isArray(body.tags) ? body.tags[0] : "Fullstack"),
-      thumbnail: body.image_url || "/images/face-card.png",
+      thumbnail: body.image_url || "",
       updated_at: new Date().toISOString(),
     };
 
@@ -29,7 +29,7 @@ export async function PUT(
       ...baseUpdateData,
       title: body.title,
       category: body.category,
-      image_url: body.image_url,
+      image_url: body.image_url || "",
       demo_url: body.demo_url,
       github_url: body.github_url,
       tags: body.tags,

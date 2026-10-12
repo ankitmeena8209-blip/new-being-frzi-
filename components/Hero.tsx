@@ -51,7 +51,7 @@ export default function Hero() {
       </motion.div>
 
       {/* main portrait container */}
-      <div className="relative z-10 mx-auto mt-6 w-full max-w-md flex-1 sm:max-w-lg">
+      <div className="relative z-10 mx-auto mt-6 w-full max-w-md flex-1 sm:max-w-[540px]">
         {/* Layer 2: 3D HTML ANKIT Text (sitting behind character) */}
         <motion.div
           style={{ y: textParallax, willChange: "transform" }}

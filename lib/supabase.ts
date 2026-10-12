@@ -29,7 +29,7 @@ export function mapRowToProject(row: any): Project {
     title: row.title || row.name || "Untitled Project",
     description: row.description || "",
     category: row.category || row.icon || "Fullstack",
-    image_url: row.image_url || row.thumbnail || "/images/face-card.png",
+    image_url: row.image_url || row.thumbnail || "",
     demo_url: row.demo_url !== undefined ? row.demo_url : (!isGithub && url ? url : null),
     github_url: row.github_url !== undefined ? row.github_url : (isGithub ? url : null),
     tags: Array.isArray(row.tags)
